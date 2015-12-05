@@ -3,10 +3,8 @@ import sys
 import subprocess
 import os
 import shutil
-
-if __name__ == "__main__":
-    env_root = os.environ['experiment_root']
-
+import pdb
+import shlex
     
 class SIRUtil:
     #experiment root should be pulled from environment
@@ -41,9 +39,9 @@ class SIRUtil:
         self.tests_path = os.path.join(self.object_path, self.tests_dir)
         
         if(SiemensTests):
-            self.version_tests_path = os.path.join(self.tests_path, self.version_dir)
+            self.version_tests_path = self.tests_path
         else:
-            self.version_tests_path = tests_path
+            self.version_tests_path = os.path.join(self.tests_path, self.version_dir)
 
         self.outputs_dir = "outputs"
         self.outputs_alt_dir = "outputs.alt"
@@ -82,11 +80,15 @@ class SIRUtil:
 
     #works with classic Siemens programs
     def compile(self, source_code_path, prog_name):
+        pdb.set_trace()
         origin_dir = os.getcwd()
         os.chdir(source_code_path)
         exit_code = subprocess.call(["gcc", "-o", prog_name + ".exe", prog_name + ".c"])
         os.chdir(origin_dir)
         return exit_code
+
+    def compile_at_compile_dir(self):
+        return self.compile(self.compilation_path, self.obj_name)
 
     def mutate(self, source_code_path):
         self.mutator.mutate(source_code_path)
@@ -107,7 +109,8 @@ class SIRUtil:
         if comp_path == "NULL":
             script_type = "R"
         print script_type
-        subprocess.call(["mts", self.object_path, executable_path, univ_file_path, script_type, script_name, comp_path, "NULL"])
+        mts_path = os.path.join(self.experiment_root, "mts/bin/bsh/mts")
+        subprocess.call([mts_path, self.object_path, executable_path, univ_file_path, script_type, script_name, comp_path, "NULL"])
 
     def make_test_script_at_build(self, universe_filename, script_name, comp_path = "NULL"):
         self.make_test_script(self.compilation_path, universe_filename, script_name, comp_path)
@@ -115,11 +118,10 @@ class SIRUtil:
 
     def run_test_script(self, script_name):
         script_path = os.path.join(self.scripts_path, script_name)
-        subprocess.call([script_path])
+        subprocess.call([script_path], shell=True)
     
     def move_test_results_to_version_res(self):
         self.move_contents_to_dir(self.outputs_path, self.outputs_alt_ver_path)
-
 
 class PatchMutator:
     def __init__(self, mutator_path, patch_db_path):
@@ -128,7 +130,11 @@ class PatchMutator:
 
     def mutate(self, target_path):
         dir_arg = target_path
-        find_proc = subprocess.Popen(["find", dir_arg, "-name", "\"*.c\""], stdout = subprocess.PIPE)
+        find_cmd = "find " + dir_arg + " -name \"*.c\""
+        find_args = shlex.split(find_cmd)
+        find_proc = subprocess.Popen(find_args, stdout = subprocess.PIPE)
         (find_stdout, find_stderr) = find_proc.communicate()
-        mut_proc = subprocess.Popen(["xargs", self.mutator_path, "-x", self.patch_db_path, "-t"], stdin = subprocess.PIPE)
+        mut_cmd = "xargs " + self.mutator_path + " -x " + self.patch_db_path + " -t"
+        mut_args = shlex.split(mut_cmd)
+        mut_proc = subprocess.Popen(mut_args, stdin = subprocess.PIPE)
         mut_proc.communicate(find_stdout)
