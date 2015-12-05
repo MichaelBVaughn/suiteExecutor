@@ -127,7 +127,7 @@ class PatchMutator:
         self.patch_db_path = patch_db_path
 
     def mutate(self, target_path):
-        dir_arg = "\"" + target_path + "\""
+        dir_arg = target_path
         find_proc = subprocess.Popen(["find", dir_arg, "-name", "\"*.c\""], stdout = subprocess.PIPE)
         (find_stdout, find_stderr) = find_proc.communicate()
         mut_proc = subprocess.Popen(["xargs", self.mutator_path, "-x", self.patch_db_path, "-t"], stdin = subprocess.PIPE)
