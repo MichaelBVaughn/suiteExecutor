@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import os
+import suiteExecutor
 
 exp_root = os.path.abspath("../..")
 name = "tcas"
