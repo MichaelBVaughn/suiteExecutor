@@ -1,6 +1,6 @@
 #!/bin/bash
 
-tar -xvf tcasPackage.tgz
+tar -xvf tcasPackage.tar
 cd tcasPackage
 cd c-tools
 make build-all
@@ -16,5 +16,4 @@ make build
 cd ..
 cd tcas/scripts
 ./tcasExec.py
-
 
