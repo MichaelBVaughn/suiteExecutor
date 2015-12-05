@@ -22,7 +22,6 @@ class SIRUtil:
         self.experiment_root = experiment_root
         self.obj_name = name
         self.version_num = version
-        self.manipulation = manipulation
         self.test_name = test_name
         #goofy, yeah.
         self.versions_dir = "versions.alt"
