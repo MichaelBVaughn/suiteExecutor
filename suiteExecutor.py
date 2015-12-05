@@ -12,9 +12,13 @@ class SIRUtil:
     #experiment root should be pulled from environment
     #name is the name of the subdirectory of experiment_root, containing the software object
     #version is the version number
-    #manipulation is some code that can be invoked to manipulate the code.
+    #SiemensTests should be set to true if the test directory structure is the classic style,
+    #and false if there are subdirectories for versions.
+    #mutator is some code that can be invoked to manipulate the code.
     #the name of the test framework to use.
-    def __init__(self, experiment_root, name, version, manipulation, test_name):
+    def __init__(self, experiment_root, name, version, test_name, SiemensTests = False, mutator = None): 
+        self.mutator = mutator
+        
         self.experiment_root = experiment_root
         self.obj_name = name
         self.version_num = version
@@ -36,7 +40,11 @@ class SIRUtil:
         self.compilation_path = os.path.join(self.object_path, self.compilation_dir)
 
         self.tests_path = os.path.join(self.object_path, self.tests_dir)
-        self.version_tests_path = os.path.join(self.tests_path, self.version_dir)
+        
+        if(SiemensTests):
+            self.version_tests_path = os.path.join(self.tests_path, self.version_dir)
+        else:
+            self.version_tests_path = tests_path
 
         self.outputs_dir = "outputs"
         self.outputs_alt_dir = "outputs.alt"
@@ -63,14 +71,29 @@ class SIRUtil:
         for entry in os.listdir(dirname):
             yield (os.path.join(dirname, entry), entry)
 
-    def compile(self, source_code_path):
+    def compile_with_make(self, source_code_path):
         origin_dir = os.getcwd()
         os.chdir(source_code_path)
-        subprocess.call(["make","build"])
+        exit_code = subprocess.call(["make","build"])
         os.chdir(origin_dir)
+        return exit_code
         
-    def compile_at_compile_dir(self):
-        self.compile(self.compilation_path)
+    def compile_with_make_at_compile_dir(self):
+        self.compile_with_make(self.compilation_path)
+
+    #works with classic Siemens programs
+    def compile(self, source_code_path, prog_name):
+        origin_dir = os.getcwd()
+        os.chdir(source_code_path)
+        exit_code = subprocess.call(["gcc", "-o", prog_name + ".exe", prog_name + ".c"])
+        os.chdir(origin_dir)
+        return exit_code
+
+    def mutate(self, source_code_path):
+        self.mutator.mutate(source_code_path)
+
+    def mutate_at_compile_dir(self):
+        self.mutate(self.compilation_path)
 
     #TODO: make diff scripts too
     #mts must be in your path, and so must cmp
@@ -87,9 +110,26 @@ class SIRUtil:
         print script_type
         subprocess.call(["mts", self.object_path, executable_path, univ_file_path, script_type, script_name, comp_path, "NULL"])
 
+    def make_test_script_at_build(self, universe_filename, script_name, comp_path = "NULL"):
+        self.make_test_script(self.compilation_path, universe_filename, script_name, comp_path)
 
-    def run_test_script(self, script_path):
+
+    def run_test_script(self, script_name):
+        script_path = os.path.join(self.scripts_path, script_name)
         subprocess.call([script_path])
     
     def move_test_results_to_version_res(self):
         self.move_contents_to_dir(self.outputs_path, self.outputs_alt_ver_path)
+
+
+class PatchMutator:
+    def __init__(self, mutator_path, patch_db_path):
+        self.mutator_path = path 
+        self.patch_db_path
+
+    def mutate(self, target_path):
+        dir_arg = "\"" + target_path + "\""
+        find_proc = subprocess.Popen(["find", dir_arg, "-name", "\"*.c\""], stdout = subprocess.PIPE)
+        (find_stdout, find_stderr) = find_proc.communicate()
+        mut_proc = subprocess.Popen(["xargs", self.mutator_path, "-x", self.patch_db_path, "-t"], stdin = subprocess.PIPE)
+        mut_proc.communicate(find_stdout)
