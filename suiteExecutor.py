@@ -80,7 +80,6 @@ class SIRUtil:
 
     #works with classic Siemens programs
     def compile(self, source_code_path, prog_name):
-        pdb.set_trace()
         origin_dir = os.getcwd()
         os.chdir(source_code_path)
         exit_code = subprocess.call(["gcc", "-o", prog_name + ".exe", prog_name + ".c"])
