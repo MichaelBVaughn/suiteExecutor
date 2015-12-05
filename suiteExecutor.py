@@ -124,8 +124,8 @@ class SIRUtil:
 
 class PatchMutator:
     def __init__(self, mutator_path, patch_db_path):
-        self.mutator_path = path 
-        self.patch_db_path
+        self.mutator_path = mutator_path
+        self.patch_db_path = patch_db_path
 
     def mutate(self, target_path):
         dir_arg = "\"" + target_path + "\""

@@ -9,8 +9,8 @@ script_name = "runall2.sh"
 mutator_path = os.path.join(exp_root, "reversePatcher/bin/mutins")
 db_path = os.path.join(exp_root, "reversePatcher/mutants.dat")
 
-mutator = PatchMutator(mutator_path, db_path)
-util = SIRUtil(exp_root, name, 41, test_name, SiemensTests = True, mutator = mutator)
+mutator = suiteExecutor.PatchMutator(mutator_path, db_path)
+util = suiteExecutor.SIRUtil(exp_root, name, 41, test_name, SiemensTests = True, mutator = mutator)
 
 util.move_version_to_compile_dir()
 util.mutate_at_compile_dir()
