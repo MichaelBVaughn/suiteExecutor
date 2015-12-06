@@ -15,5 +15,6 @@ cd tsl
 make build
 cd ..
 cd tcas/scripts
-./tcasExec.py
-
+./tcasExec.py $1
+cd ../..
+diff tcas/source/tcas.c tcas/versions.alt/versions.orig/v41/tcas.c  >> "job-$1-result.txt" 

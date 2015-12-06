@@ -1,7 +1,9 @@
 #!/usr/bin/python
 import os
+import sys
 import suiteExecutor
 
+job_num = sys.argv[1]
 exp_root = os.path.abspath("../..")
 name = "tcas"
 test_name = "universe"
@@ -17,7 +19,11 @@ util.mutate_at_compile_dir()
 #TODO: add comp_path once everything else works. Then, package original test results at path.
 #TODO: look at old-style test building
 #util.make_test_script_at_build(test_name, script_name)
+outFilename = "job-" + str(job_num) + "-result.txt"
+outPath = os.path.join(exp_root, outFilename)
+outFile = open(outPath, 'w')
 if 0 == util.compile_at_compile_dir():
+    outFile.write("compilation succeeded\n")
     util.run_test_script(script_name)
 else:
-    print "compilation failed"
+    outFile.write("compilation failed\n")
