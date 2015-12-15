@@ -19,6 +19,7 @@ def analysisLogic(resultFile):
     target_str = "compilation failed\n"
     statusStr = resultFile.readline()
     successfulCompile = target_str != statusStr
+    print statusStr
     mutation = resultFile.readlines()
     if successfulCompile:
         mutation.insert(0, statusStr)
@@ -28,14 +29,15 @@ def accumLogic(analysisResults, acc):
     if analysisResults[0]:
         acc.successfulCompilations += 1
     acc.numResults += 1
-    acc.successfulMutantsFile.write("Mutant +" + str(len(analysisResults[1])))
-    acc.successfulMutantsFile.writelines(analysisResults[1])
+    if analysisResults[0]:
+        acc.successfulMutantsFile.write("Mutant +" + str(len(analysisResults[1])))
+        acc.successfulMutantsFile.writelines(analysisResults[1])
     return acc
 
 
 if __name__ == "__main__":
     acc = tcasAcc()
-    path = "/u/v/a/vaughn/public/traceAnalysis/tcas/test1/results/"
+    path = "/u/v/a/vaughn/public/traceAnalysis/tcas/test2/results/"
     analyzer = resultAnalysis.BaseResultAnalyzer(path, resultPred, analysisLogic, accumLogic, acc)
     final = analyzer.analyzeAll()
     final.cleanup()
