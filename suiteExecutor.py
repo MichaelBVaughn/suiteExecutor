@@ -76,7 +76,7 @@ class SIRUtil:
         return exit_code
         
     def compile_with_make_at_compile_dir(self):
-        self.compile_with_make(self.compilation_path)
+        return self.compile_with_make(self.compilation_path)
 
     #works with classic Siemens programs
     def compile(self, source_code_path, prog_name):
@@ -86,14 +86,24 @@ class SIRUtil:
         os.chdir(origin_dir)
         return exit_code
 
+    #return value dependent on mutator
     def compile_at_compile_dir(self):
         return self.compile(self.compilation_path, self.obj_name)
 
+    #return value dependent on mutator
     def mutate(self, source_code_path):
-        self.mutator.mutate(source_code_path)
+        return self.mutator.mutate(source_code_path)
 
     def mutate_at_compile_dir(self):
-        self.mutate(self.compilation_path)
+        return self.mutate(self.compilation_path)
+
+    #theoretically it should be refactored up a level. No biggie. We'll do that
+    #when there's free time.
+    #mutate until successful compilation, or attempts exceeds tries
+    #requires the verbose mutator
+    def iter_mut_and_compile(self, base, tries):
+        for i in range(base, base + tries):
+            mut_output = 
 
     #TODO: make diff scripts too
     #mts must be in your path, and so must cmp
@@ -113,7 +123,6 @@ class SIRUtil:
 
     def make_test_script_at_build(self, universe_filename, script_name, comp_path = "NULL"):
         self.make_test_script(self.compilation_path, universe_filename, script_name, comp_path)
-
 
     def run_test_script(self, script_name):
         script_path = os.path.join(self.scripts_path, script_name)
@@ -137,3 +146,33 @@ class PatchMutator:
         mut_args = shlex.split(mut_cmd)
         mut_proc = subprocess.Popen(mut_args, stdin = subprocess.PIPE)
         mut_proc.communicate(find_stdout)
+
+class VerboseRandPatchMutator:
+    def __init__(self, mutator_path, patch_db_path, seed):
+        self.mutator_path = mutator_path
+        self.patch_db_path = patch_db_path
+        self.seed = seed
+
+    #get C files, pipe them through xargs to mutator.
+    #returns stdout from mutins -v as a string.
+    def mutate(self, target_path):
+        dir_arg = target_path
+        find_cmd = "find " + dir_arg + " -name \"*.c\""
+        find_args = shlex.split(find_cmd)
+        find_proc = subprocess.Popen(find_args, stdout = subprocess.PIPE)
+        mut_cmd = "xargs " + self.mutator_path + "-v -x " + self.patch_db_path + " -r " + str(self.seed) + " -t"
+        mut_args = shlex.split(mut_cmd)
+        mut_proc = subprocess.Popen(mut_args, stdin = find_proc.stdout, stdout = subprocess.PIPE)
+        find_proc.stdout.close()
+        output = mut_proc.communicate()[0]
+        return output
+
+#returns (.orig filename, .c filename, patch_data)
+def deconstruct_verbose_results(result_str):
+    lines = result_str.splitlines()
+    name_line = lines[2] 
+    dot_orig = lines[10:] #remove "Creating ./"
+    dot_c = dot_orig[:-6] #remove ".orig."
+    patch_data = lines[3:]
+    return (dot_orig, dot_c, patch_data)    
+

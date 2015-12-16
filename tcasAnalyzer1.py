@@ -19,7 +19,6 @@ def analysisLogic(resultFile):
     target_str = "compilation failed\n"
     statusStr = resultFile.readline()
     successfulCompile = target_str != statusStr
-    print statusStr
     mutation = resultFile.readlines()
     if successfulCompile:
         mutation.insert(0, statusStr)
@@ -37,7 +36,7 @@ def accumLogic(analysisResults, acc):
 
 if __name__ == "__main__":
     acc = tcasAcc()
-    path = "/u/v/a/vaughn/public/traceAnalysis/tcas/test2/results/"
+    path = "/scratch/tcasTest3/"
     analyzer = resultAnalysis.BaseResultAnalyzer(path, resultPred, analysisLogic, accumLogic, acc)
     final = analyzer.analyzeAll()
     final.cleanup()
