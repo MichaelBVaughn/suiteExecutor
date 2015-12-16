@@ -1,9 +1,9 @@
-SRC_DIR=tcasPackage
-PACKAGE_NAME=tcasPackage
+SRC_DIR=vimPackage
+PACKAGE_NAME=vimPackage
 PACKAGE_TAR=$(PACKAGE_NAME).tar
-SCRIPT_DIR=tcasPackage/tcas/scripts
-EXEC_SCRIPT_NAME=tcasExec.py
-TEST_DIR=/u/v/a/vaughn/packageTest
+SCRIPT_DIR=vimPackage/vim/scripts
+EXEC_SCRIPT_NAME=vimExec.py
+TEST_DIR=/scratch/packageTest
 
 all: package
 
@@ -20,6 +20,9 @@ suiteExecutor:
 
 execScript:
 	cp $(EXEC_SCRIPT_NAME) $(SCRIPT_DIR)
+
+shebangFix:
+	cp shebangFix $(SCRIPT_DIR)
 
 unpackScript:
 	cp unpack.sh $(TEST_DIR)
