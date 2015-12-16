@@ -4,6 +4,15 @@ wget http://proxy.chtc.wisc.edu/SQUID/mvaughn/x-tools.tar.gz
 tar -xvzf x-tools.tar.gz
 rm x-tools.tar.gz
 
+wget http://proxy.chtc.wisc.edu/SQUID/mvaughn/tcl.tar.gz
+tar -xvzf tcl.tar.gz
+rm tcl.tar.gz
+
+wget http://proxy.chtc.wisc.edu/SQUID/mvaughn/vim_1.0.tar
+tar -xvf vim_1.0.tar
+rm vim_1.0.tar
+
+
 export PATH=$_CONDOR_JOB_IWD/x-tools/x86_64-unknown-linux-gnu/bin:$PATH
 
 tar -xvf tcasPackage.tar

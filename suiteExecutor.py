@@ -91,19 +91,12 @@ class SIRUtil:
         return self.compile(self.compilation_path, self.obj_name)
 
     #return value dependent on mutator
-    def mutate(self, source_code_path):
-        return self.mutator.mutate(source_code_path)
+    def mutate(self, source_code_path, seed=None):
+        return self.mutator.mutate(source_code_path, seed)
 
-    def mutate_at_compile_dir(self):
-        return self.mutate(self.compilation_path)
+    def mutate_at_compile_dir(self, seed=None):
+        return self.mutate(self.compilation_path, seed)
 
-    #theoretically it should be refactored up a level. No biggie. We'll do that
-    #when there's free time.
-    #mutate until successful compilation, or attempts exceeds tries
-    #requires the verbose mutator
-    def iter_mut_and_compile(self, base, tries):
-        for i in range(base, base + tries):
-            mut_output = 
 
     #TODO: make diff scripts too
     #mts must be in your path, and so must cmp
@@ -136,7 +129,8 @@ class PatchMutator:
         self.mutator_path = mutator_path
         self.patch_db_path = patch_db_path
 
-    def mutate(self, target_path):
+    #Discard seed
+    def mutate(self, target_path, seed=None):
         dir_arg = target_path
         find_cmd = "find " + dir_arg + " -name \"*.c\""
         find_args = shlex.split(find_cmd)
@@ -148,19 +142,18 @@ class PatchMutator:
         mut_proc.communicate(find_stdout)
 
 class VerboseRandPatchMutator:
-    def __init__(self, mutator_path, patch_db_path, seed):
+    def __init__(self, mutator_path, patch_db_path):
         self.mutator_path = mutator_path
         self.patch_db_path = patch_db_path
-        self.seed = seed
 
     #get C files, pipe them through xargs to mutator.
     #returns stdout from mutins -v as a string.
-    def mutate(self, target_path):
+    def mutate(self, target_path, seed=None):
         dir_arg = target_path
         find_cmd = "find " + dir_arg + " -name \"*.c\""
         find_args = shlex.split(find_cmd)
         find_proc = subprocess.Popen(find_args, stdout = subprocess.PIPE)
-        mut_cmd = "xargs " + self.mutator_path + "-v -x " + self.patch_db_path + " -r " + str(self.seed) + " -t"
+        mut_cmd = "xargs " + self.mutator_path + "-v -x " + self.patch_db_path + " -r " + str(seed) + " -t"
         mut_args = shlex.split(mut_cmd)
         mut_proc = subprocess.Popen(mut_args, stdin = find_proc.stdout, stdout = subprocess.PIPE)
         find_proc.stdout.close()
