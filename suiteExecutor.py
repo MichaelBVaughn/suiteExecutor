@@ -71,7 +71,9 @@ class SIRUtil:
     def compile_with_make(self, source_code_path):
         origin_dir = os.getcwd()
         os.chdir(source_code_path)
-        exit_code = subprocess.call(["make","build"])
+        exit_code = subprocess.call(["make","config"])
+        if exit_code == 0:
+            exit_code = subprocess.call(["make","install"])
         os.chdir(origin_dir)
         return exit_code
         
@@ -153,7 +155,7 @@ class VerboseRandPatchMutator:
         find_cmd = "find " + dir_arg + " -name \"*.c\""
         find_args = shlex.split(find_cmd)
         find_proc = subprocess.Popen(find_args, stdout = subprocess.PIPE)
-        mut_cmd = "xargs " + self.mutator_path + "-v -x " + self.patch_db_path + " -r " + str(seed) + " -t"
+        mut_cmd = "xargs " + self.mutator_path + " -v -x " + self.patch_db_path + " -r " + str(seed) + " -t"
         mut_args = shlex.split(mut_cmd)
         mut_proc = subprocess.Popen(mut_args, stdin = find_proc.stdout, stdout = subprocess.PIPE)
         find_proc.stdout.close()
