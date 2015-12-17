@@ -23,7 +23,7 @@ class SIRUtil:
         self.test_name = test_name
         #goofy, yeah.
         self.versions_dir = "versions.alt"
-        self.orig_dir = "versions.orig"
+        self.seeded_dir = "versions.seeded"
         self.compilation_dir = "source"
         self.tests_dir = "testplans.alt"
         self.scripts_dir = "scripts"
@@ -31,9 +31,9 @@ class SIRUtil:
         self.scripts_path = os.path.join(self.object_path, self.scripts_dir)
         os.chdir(self.scripts_path)
         
-        self.orig_versions_path = os.path.join(self.object_path, self.versions_dir, self.orig_dir)
+        self.seeded_versions_path = os.path.join(self.object_path, self.versions_dir, self.seeded_dir)
         self.version_dir = "v" + str(self.version_num)
-        self.version_src_path = os.path.join(self.orig_versions_path, self.version_dir)
+        self.version_src_path = os.path.join(self.seeded_versions_path, self.version_dir)
         self.compilation_path = os.path.join(self.object_path, self.compilation_dir)
 
         self.tests_path = os.path.join(self.object_path, self.tests_dir)

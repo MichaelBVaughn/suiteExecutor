@@ -44,6 +44,7 @@ def iter_mut_and_compile(util, job, tries, output_dir, test_script_name):
 job_num = int(sys.argv[1])
 tries = int(sys.argv[2])
 exp_root = os.path.abspath("../..")
+toplevel = os.path.abspath("../../..")
 name = "vim"
 test_name = "universe"
 script_name = "runall"
@@ -54,7 +55,7 @@ mutator = suiteExecutor.VerboseRandPatchMutator(mutator_path, db_path)
 util = suiteExecutor.SIRUtil(exp_root, name, 7, test_name, SiemensTests = True, mutator = mutator)
 
 util.move_version_to_compile_dir()
-iter_mut_and_compile(util, job_num, tries, exp_root, script_name)
+iter_mut_and_compile(util, job_num, tries, toplevel, script_name)
 #TODO: add comp_path once everything else works. Then, package original test results at path.
 #TODO: look at old-style test building
 #util.make_test_script_at_build(test_name, script_name)
